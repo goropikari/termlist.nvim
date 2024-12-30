@@ -48,9 +48,15 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   spec = {
     {
-      dir = '/workspaces/plugin-template.nvim',
+      'goropikari/plugin-template.nvim',
+      dev = true,
       opts = {},
     },
+  },
+  dev = {
+    path = '/workspaces',
+    patterns = { 'goropikari' }, -- For example {"folke"}
+    fallback = true, -- Fallback to git when local plugin doesn't exist
   },
   checker = { enabled = true },
 })
