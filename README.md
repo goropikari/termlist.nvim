@@ -22,6 +22,7 @@ TermList.nvim is a Neovim plugin that provides VSCode-like terminal management.
         rename   = "r",
         add      = "<C-n>",
       },
+      height_ratio = 0.35,
     },
   },
 

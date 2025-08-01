@@ -11,6 +11,7 @@ local default_config = {
     rename = 'r',
     add = '<c-n>',
   },
+  height_ratio = 0.35,
 }
 
 local config = {}
@@ -42,6 +43,7 @@ local function current_view_buf()
   return nil
 end
 
+---@return Terminal
 local function new_terminal()
   local term = toggleterm.Terminal:new({ cmd = config.shell, hidden = false })
   term:spawn()
@@ -63,7 +65,7 @@ end
 ---@return integer
 local function view_win()
   local total_height = vim.o.lines
-  local height = math.floor(total_height * 0.4)
+  local height = math.floor(total_height * config.height_ratio)
   if state.view_win and vim.api.nvim_win_is_valid(state.view_win) then
     return state.view_win
   end
@@ -74,8 +76,12 @@ local function view_win()
     split = 'below',
     win = 0,
   }
-  state.view_win = vim.api.nvim_open_win(view_buf(), true, view_opts)
-  return state.view_win
+  local winid = vim.api.nvim_open_win(view_buf(), true, view_opts)
+  state.view_win = winid
+  vim.api.nvim_win_set_config(winid, view_opts)
+  vim.cmd('wincmd J')
+  vim.api.nvim_win_set_height(winid, height)
+  return winid
 end
 
 function M.open()
@@ -88,7 +94,8 @@ function M.open()
     state.view_buf = term.bufnr
   end
 
-  view_win()
+  local winid = view_win()
+  vim.api.nvim_win_set_buf(winid, view_buf())
 
   -- terminal 一覧 window
   state.list_buf = vim.api.nvim_create_buf(false, true)
@@ -195,13 +202,14 @@ function M.shutdown_terminal()
   M.refresh_list()
 end
 
-function M.add_terminal(is_move)
+---@param forcus boolean
+function M.add_terminal(forcus)
   local term = new_terminal()
   show(term)
   vim.schedule(function()
     M.refresh_list()
   end)
-  if is_move then
+  if forcus then
     vim.api.nvim_set_current_win(view_win())
     return
   end
