@@ -48,7 +48,10 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   spec = {
     {
-      'goropikari/plugin-template.nvim',
+      'goropikari/termlist.nvim',
+      dependencies = {
+        'akinsho/toggleterm.nvim',
+      },
       dev = true,
       opts = {},
     },

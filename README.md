@@ -2,6 +2,8 @@
 
 TermList.nvim is a Neovim plugin that provides VSCode-like terminal management.
 
+![image](./doc/termlist.png)
+
 # Installation
 
 ```lua
