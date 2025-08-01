@@ -6,6 +6,8 @@ TermList.nvim is a Neovim plugin that provides VSCode-like terminal management.
 
 # Installation
 
+For [lazy.nvim](https://github.com/folke/lazy.nvim)
+
 ```lua
   {
     'goropikari/termlist.nvim',
@@ -23,6 +25,32 @@ TermList.nvim is a Neovim plugin that provides VSCode-like terminal management.
         add      = "<C-n>",
       },
       height_ratio = 0.35,
+    },
+    -- optional: keymaps
+    keys = {
+      {
+        '<c-t>',
+        function()
+          require('termlist').toggle()
+        end,
+        mode = { 'n', 't' },
+      },
+      {
+        '<leader>ss',
+        function()
+          require('termlist').send_current_line()
+        end,
+        desc = 'Send current line to termlist',
+        mode = { 'n' },
+      },
+      {
+        '<leader>ss',
+        function(opts)
+          require('termlist').send_visual_text(opts)
+        end,
+        desc = 'Send visual text to termlist',
+        mode = { 'v' },
+      },
     },
   },
 

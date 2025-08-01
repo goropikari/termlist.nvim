@@ -85,6 +85,11 @@ local function view_win()
 end
 
 function M.open()
+  if state.view_win and vim.api.nvim_win_is_valid(state.view_win) then
+    -- すでに view window が開いている場合は何もしない
+    return
+  end
+
   -- editor 全体サイズ
   local total_width = vim.o.columns
   local list_width = math.floor(total_width * 0.2)
@@ -236,6 +241,50 @@ function M.toggle()
   else
     M.open()
   end
+end
+
+---@return Terminal
+local function get_current_term()
+  local lines = vim.api.nvim_buf_get_lines(state.list_buf, 0, -1, false)
+  for i, line in ipairs(lines) do
+    if line:sub(1, 1) == '>' then
+      return state.terminals[i]
+    end
+  end
+end
+
+local function get_visual_lines(opts)
+  if vim.fn.mode() == 'n' then -- command から使う用
+    return vim.fn.getline(opts.line1, opts.line2)
+  else -- <leader> key を使った keymap 用
+    local lines = vim.fn.getregion(vim.fn.getpos('v'), vim.fn.getpos('.'), { type = vim.fn.mode() })
+    -- https://github.com/neovim/neovim/discussions/26092
+    vim.cmd([[ execute "normal! \<ESC>" ]])
+    return lines
+  end
+end
+
+local function get_visual_text(opts)
+  local texts = get_visual_lines(opts or {})
+  vim.print(texts)
+  return vim.fn.join(texts, '\n')
+end
+
+function M.send_current_line()
+  M.open()
+  local term = get_current_term()
+
+  local line = vim.api.nvim_get_current_line()
+  if line ~= '' then
+    term:send(line, true)
+  end
+end
+
+function M.send_visual_text(opts)
+  M.open()
+  local term = get_current_term()
+
+  term:send(get_visual_text(opts), true)
 end
 
 function M.setup(opts)
